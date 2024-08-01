@@ -53,7 +53,7 @@ var CatalogCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		err = common.WriteToCSV([][]string{template}, outputfile)
+		err = common.WriteCSV([][]string{template}, outputfile)
 		if err != nil {
 			slog.Error(fmt.Sprintf("Error: %v", err))
 			os.Exit(1)

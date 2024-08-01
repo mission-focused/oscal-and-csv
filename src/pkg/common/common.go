@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func WriteToCSV(rows [][]string, filePath string) error {
+func WriteCSV(rows [][]string, filePath string) error {
 	file, err := os.Create(filePath)
 	if err != nil {
 		return err
@@ -23,6 +23,22 @@ func WriteToCSV(rows [][]string, filePath string) error {
 		return err
 	}
 	return nil
+}
+
+func ReadCSVFile(filePath string) ([][]string, error) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return [][]string{}, fmt.Errorf("unable to read input file: %w", err)
+	}
+	defer f.Close()
+
+	csvReader := csv.NewReader(f)
+	records, err := csvReader.ReadAll()
+	if err != nil {
+		fmt.Errorf("unable to parse file as CSV for %s with error: %w", filePath, err)
+	}
+
+	return records, nil
 }
 
 func CheckFileExists(filePath string) bool {

@@ -6,10 +6,12 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
 	"github.com/mission-focused/oscal-and-csv/src/pkg/common"
+	"github.com/mission-focused/oscal-and-csv/src/pkg/oscal"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slog"
 )
@@ -42,17 +44,33 @@ var ConvertCatalogCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		data, err := common.ReadFile(opts.InputFile)
-		if err != nil {
-			slog.Error("unable to read input file", err)
-			os.Exit(1)
-		}
-
 		if target == "OSCAL" {
 			// Convert from CSV to OSCAL
+			records, err := common.ReadCSVFile(opts.InputFile)
+			if err != nil {
+				slog.Error("unable to read csv file", err)
+			}
+
+			// Convert to catalog
+			catalog, err := oscal.CSVToCatalog(records)
+			if err != nil {
+				slog.Error("unable to convert to OSCAL", err)
+			}
 
 		} else {
 			// Convert from OSCAL to CSV
+			data, err := common.ReadFile(opts.InputFile)
+			if err != nil {
+				slog.Error("unable to read input file", err)
+				os.Exit(1)
+			}
+
+			// create catalog model object from []byte
+			records, err := oscal.CatalogToCSV(data)
+			if err != nil {
+				slog.Error("unable to convert to CSV", err)
+			}
+
 		}
 
 	},
