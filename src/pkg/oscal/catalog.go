@@ -1,6 +1,6 @@
 package oscal
 
-import oscalTypes_1_1_2 "github.com/defenseunicorns/go-oscal/src/types/oscal-1-1-2"
+import oscalTypes "github.com/defenseunicorns/go-oscal/src/types/oscal-1-1-2"
 
 func CatalogToTemplate() (csv []string, err error) {
 
@@ -17,7 +17,7 @@ func CatalogToCSV(data []byte) (records [][]string, err error) {
 
 // This function should read a CSV file, and create groups and controls for each row
 // will need to check that the group exists if the column is populated
-func CSVToCatalog(records [][]string) (catalog oscalTypes_1_1_2.Catalog, err error) {
+func CSVToCatalog(records [][]string) (catalog oscalTypes.Catalog, err error) {
 
 	return catalog, nil
 }

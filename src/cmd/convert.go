@@ -10,10 +10,11 @@ import (
 	"os"
 	"strings"
 
+	oscalTypes "github.com/defenseunicorns/go-oscal/src/types/oscal-1-1-2"
+
 	"github.com/mission-focused/oscal-and-csv/src/pkg/common"
 	"github.com/mission-focused/oscal-and-csv/src/pkg/oscal"
 	"github.com/spf13/cobra"
-	"golang.org/x/exp/slog"
 )
 
 type flags struct {
@@ -35,7 +36,7 @@ var ConvertCatalogCmd = &cobra.Command{
 	Short: "Convert OSCAL Catalog to CSV or CSV to OSCAL Catalog",
 	Long:  `Convert OSCAL Catalog to CSV or CSV to OSCAL Catalog`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Convert Catalog called")
+		slog.Info("Convert Executed")
 
 		// Process whether the combo is permitted
 		target, err := processConversionPath(opts.InputFile, opts.OutputFile)
@@ -55,6 +56,17 @@ var ConvertCatalogCmd = &cobra.Command{
 			catalog, err := oscal.CSVToCatalog(records)
 			if err != nil {
 				slog.Error("unable to convert to OSCAL", err)
+				os.Exit(1)
+			}
+
+			var model = oscalTypes.OscalModels{
+				Catalog: &catalog,
+			}
+
+			err = oscal.WriteOSCALModel(opts.OutputFile, &model)
+			if err != nil {
+				slog.Error("unable to write file", err)
+				os.Exit(1)
 			}
 
 		} else {
@@ -71,7 +83,14 @@ var ConvertCatalogCmd = &cobra.Command{
 				slog.Error("unable to convert to CSV", err)
 			}
 
+			err = common.WriteCSV(records, opts.OutputFile)
+			if err != nil {
+				slog.Error("unable to file", err)
+				os.Exit(1)
+			}
 		}
+
+		slog.Info(fmt.Sprintf("File written to %s\n", opts.OutputFile))
 
 	},
 }
