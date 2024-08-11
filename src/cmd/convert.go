@@ -10,8 +10,6 @@ import (
 	"os"
 	"strings"
 
-	oscalTypes "github.com/defenseunicorns/go-oscal/src/types/oscal-1-1-2"
-
 	"github.com/mission-focused/oscal-and-csv/src/pkg/common"
 	"github.com/mission-focused/oscal-and-csv/src/pkg/oscal"
 	"github.com/spf13/cobra"
@@ -59,13 +57,9 @@ var ConvertCatalogCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			var model = oscalTypes.OscalModels{
-				Catalog: &catalog,
-			}
-
-			err = oscal.WriteOSCALModel(opts.OutputFile, &model)
+			err = oscal.WriteCatalog(catalog, opts.OutputFile)
 			if err != nil {
-				slog.Error("unable to write file", err)
+				slog.Error("unable to write to file", err)
 				os.Exit(1)
 			}
 
@@ -97,9 +91,10 @@ var ConvertCatalogCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(ConvertCmd)
+	ConvertCmd.AddCommand(ConvertCatalogCmd)
 
 	// Here you will define your flags and configuration settings.
-	ConvertCatalogCmd.Flags().StringVarP(&opts.InputFile, "input-file", "i", "", "the path to the input file")
+	ConvertCatalogCmd.Flags().StringVarP(&opts.InputFile, "input-file", "f", "", "the path to the input file")
 	ConvertCatalogCmd.Flags().StringVarP(&opts.OutputFile, "output-file", "o", "", "the path to write the output file")
 	ConvertCatalogCmd.MarkFlagRequired("input-file")
 	ConvertCatalogCmd.MarkFlagRequired("output-file")

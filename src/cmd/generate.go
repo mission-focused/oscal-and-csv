@@ -47,7 +47,7 @@ var CatalogCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		template, err := oscal.CatalogToTemplate()
+		template, err := oscal.CatalogTemplate()
 		if err != nil {
 			slog.Error("Unable to generate a catalog template csv")
 			os.Exit(1)
