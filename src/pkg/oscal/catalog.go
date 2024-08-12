@@ -8,7 +8,7 @@ import (
 
 func CatalogTemplate() (csv []string, err error) {
 
-	csv = []string{"ID", "Group", "Class", "Title", "Params", "Props", "Links", "Parts", "Controls"}
+	csv = []string{"ID", "Group Name", "Group ID", "Class", "Title", "Params", "Props", "Links", "Parts"}
 
 	return csv, nil
 }
@@ -27,7 +27,7 @@ func CatalogToCSV(data []byte) (records [][]string, err error) {
 	}
 
 	if catalog.Controls != nil {
-		tmpRecords := searchControls(catalog.Controls, "")
+		tmpRecords := searchControls(catalog.Controls, "", "")
 		records = append(records, tmpRecords...)
 	}
 
@@ -76,7 +76,7 @@ func searchGroups(groups *[]oscalTypes.Group) [][]string {
 			records = append(records, tmpRecords...)
 		}
 		if group.Controls != nil {
-			tmpRecords := searchControls(group.Controls, group.ID)
+			tmpRecords := searchControls(group.Controls, group.ID, group.Title)
 			records = append(records, tmpRecords...)
 		}
 	}
@@ -85,16 +85,38 @@ func searchGroups(groups *[]oscalTypes.Group) [][]string {
 
 }
 
-func searchControls(controls *[]oscalTypes.Control, group string) [][]string {
+func searchControls(controls *[]oscalTypes.Control, groupName string, groupId string) [][]string {
 
 	records := make([][]string, 0)
 
 	// TODO: create string representations for the remaining fields
 
 	for _, control := range *controls {
-		record := []string{control.ID, group, control.Class, control.Title, "", "", "", "", ""}
+		var params, props, links, parts string
+
+		if control.Params != nil {
+			params = toDelimitedParams(control.Params)
+		}
+
+		record := []string{control.ID, groupName, groupId, control.Class, control.Title, params, props, links, parts}
 		records = append(records, record)
 	}
 
 	return records
+}
+
+func toDelimitedParams(params *[]oscalTypes.Parameter) (parameters string) {
+
+	// for _, param := range *params {
+
+	// }
+
+	return parameters
+}
+
+func fromDelimitedParams(params string) *[]oscalTypes.Parameter {
+
+	param := make([]oscalTypes.Parameter, 0)
+
+	return &param
 }

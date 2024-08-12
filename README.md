@@ -31,3 +31,7 @@ OSCAL provides many nested or otherwise structured models, objects, and fields t
 What we can do to improve the potential for data-loss is performing a merge when the data exists in an existing OSCAL model. 
 
 See the [docs](./docs/README.md) for more information on model specifics.
+
+## Future
+
+Implement a system to support nested fields. Thinking along the lines of a single CSV field that creates a delimited string in such a way as to define nested field key/value.
