@@ -13,7 +13,7 @@ import (
 
 func CatalogTemplate() (csv []string, err error) {
 
-	csv = []string{"ID", "Group Name", "Group ID", "Class", "Title", "Params", "Props", "Links", "Parts"}
+	csv = []string{"ID", "Group Title", "Group ID", "Class", "Title", "Params", "Props", "Links", "Parts"}
 
 	return csv, nil
 }
@@ -43,8 +43,56 @@ func CatalogToCSV(data []byte) (records [][]string, err error) {
 
 // This function should read a CSV file, and create groups and controls for each row
 // will need to check that the group exists if the column is populated
-// TODO: implement this functionality
+// TODO: need to fill out catalog metadata
+// TODO: need to unflatten if present
 func CSVToCatalog(records [][]string) (catalog oscalTypes.Catalog, err error) {
+
+	// Create a map for storing controls
+	groupMap := make(map[string][]oscalTypes.Control)
+	groups := make([]oscalTypes.Group, 0)
+
+	// Add controls to the groupMap
+	for _, record := range records[1:] {
+
+		control := oscalTypes.Control{
+			ID:    record[0],
+			Class: record[3],
+			Title: record[4],
+		}
+
+		if record[2] == "" {
+			if _, ok := groupMap["nogroup"]; !ok {
+				groupMap["nogroup"] = make([]oscalTypes.Control, 0)
+			}
+			record[2] = "nogroup"
+		} else if _, ok := groupMap[record[2]]; !ok {
+			groupMap[record[2]] = make([]oscalTypes.Control, 0)
+		}
+		groupMap[record[2]] = append(groupMap[record[2]], control)
+	}
+
+	// Convert groupMap to a group object and assign controls
+	// process the default controls first
+	if controls, ok := groupMap["nogroup"]; ok {
+		catalog.Controls = &controls
+	}
+
+	for id, controls := range groupMap {
+		if id == "nogroup" {
+			continue
+		}
+
+		group := oscalTypes.Group{
+			ID:       id,
+			Title:    "some title",
+			Controls: &controls,
+		}
+
+		groups = append(groups, group)
+
+	}
+
+	catalog.Groups = &groups
 
 	return catalog, nil
 }
