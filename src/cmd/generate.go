@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/mission-focused/oscal-and-csv/src/pkg/common"
 	"github.com/mission-focused/oscal-and-csv/src/pkg/oscal"
@@ -40,16 +41,22 @@ var CatalogCmd = &cobra.Command{
 			outputfile = "catalog.csv"
 		}
 
-		// TODO: Check for existing file - error if exists?
-
-		template, err := oscal.CatalogToTemplate()
-		if err != nil {
-			slog.Error("Unable to generate a catalog template csv")
+		// Check for existing file - error if exists?
+		if common.CheckFileExists(outputfile) {
+			slog.Error(fmt.Sprintf("Error: %s already exists", outputfile))
+			os.Exit(1)
 		}
 
-		err = common.WriteToCSV([][]string{template}, outputfile)
+		template, err := oscal.CatalogTemplate()
+		if err != nil {
+			slog.Error("Unable to generate a catalog template csv")
+			os.Exit(1)
+		}
+
+		err = common.WriteCSV([][]string{template}, outputfile)
 		if err != nil {
 			slog.Error(fmt.Sprintf("Error: %v", err))
+			os.Exit(1)
 		}
 
 		slog.Info(fmt.Sprintf("CSV template written to: %s", outputfile))
